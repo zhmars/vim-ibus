@@ -8,23 +8,6 @@ function! ibus#gdbus(cmd)
       \ )
 endfunction
 
-function! ibus#index()
-  let l:cmd = '"imports.ui.status.keyboard.getInputSourceManager().inputSources"'
-  let l:input_sources = ibus#gdbus(l:cmd)
-  let l:input_sources = json_decode(split(l:input_sources, "'")[1])
-
-  for i in keys(l:input_sources)
-    if l:input_sources[i]['type'] == g:ibus#layout_config['type']
-      \ && l:input_sources[i]['id'] == g:ibus#layout_config['id']
-      let g:ibus#layout_config['index'] = l:input_sources[i]['index']
-
-    elseif l:input_sources[i]['type'] == g:ibus#engine_config['type']
-      \ && l:input_sources[i]['id'] == g:ibus#engine_config['id']
-      let g:ibus#engine_config['index'] = l:input_sources[i]['index']
-    endif
-  endfor
-endfunction
-
 function! ibus#switch(index)
   let l:cmd = printf('"imports.ui.status.keyboard.getInputSourceManager().inputSources[%s].activate()"', a:index)
   call ibus#gdbus(l:cmd)
@@ -32,7 +15,7 @@ function! ibus#switch(index)
 endfunction
 
 function! ibus#inactivate()
-  if g:ibus#in_gnome3
+  if g:ibus#on_gnome
     call ibus#switch(g:ibus#layout_config['index'])
   else
     exe "call system('ibus engine " . g:ibus#layout . "')"
@@ -41,7 +24,7 @@ function! ibus#inactivate()
 endfunction
 
 function! ibus#activate()
-  if g:ibus#in_gnome3
+  if g:ibus#on_gnome
     call ibus#switch(g:ibus#engine_config['index'])
   else
     exe "call system('ibus engine " . g:ibus#engine . "')"

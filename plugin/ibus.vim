@@ -36,10 +36,29 @@ else
   endif
 endif
 
-if exists('g:ibus#in_gnome3') && g:ibus#in_gnome3
-  call ibus#index()
+if !executable('gnome-shell')
+  let g:ibus#on_gnome = 0
 else
-  let g:ibus#in_gnome3 = 0
+  let s:cmd = '"imports.ui.status.keyboard.getInputSourceManager().inputSources"'
+  let s:input_sources = ibus#gdbus(s:cmd)
+  if len(s:input_sources) && s:input_sources[1:4] ==# 'true'
+    let s:input_sources = json_decode(split(s:input_sources, "'")[1])
+    for i in keys(s:input_sources)
+      if s:input_sources[i]['type'] == g:ibus#layout_config['type']
+        \ && s:input_sources[i]['id'] == g:ibus#layout_config['id']
+        let g:ibus#layout_config['index'] = s:input_sources[i]['index']
+
+      elseif s:input_sources[i]['type'] == g:ibus#engine_config['type']
+        \ && s:input_sources[i]['id'] == g:ibus#engine_config['id']
+        let g:ibus#engine_config['index'] = s:input_sources[i]['index']
+      endif
+    endfor
+
+    if has_key(g:ibus#layout_config, 'index')
+      \ && has_key(g:ibus#engine_config, 'index')
+      let g:ibus#on_gnome = 1
+    endif
+  endif
 endif
 
 let s:save_cpo = &cpo
