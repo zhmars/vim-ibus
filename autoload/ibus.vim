@@ -15,7 +15,7 @@ function! ibus#switch(index)
 endfunction
 
 function! ibus#inactivate()
-  if g:ibus#on_gnome
+  if exists('g:ibus#on_gnome') && g:ibus#on_gnome
     call ibus#switch(g:ibus#layout_config['index'])
   else
     exe "call system('ibus engine " . g:ibus#layout . "')"
@@ -24,7 +24,7 @@ function! ibus#inactivate()
 endfunction
 
 function! ibus#activate()
-  if g:ibus#on_gnome
+  if exists('g:ibus#on_gnome') && g:ibus#on_gnome
     call ibus#switch(g:ibus#engine_config['index'])
   else
     exe "call system('ibus engine " . g:ibus#engine . "')"
@@ -50,7 +50,7 @@ function! ibus#inactivate_with_state()
 endfunction
 
 function! ibus#restore_state()
-  if b:was_ibus_on
+  if exists('b:was_ibus_on') && b:was_ibus_on
     return ibus#activate()
   else
     return ibus#inactivate()
