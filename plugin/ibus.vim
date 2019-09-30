@@ -28,9 +28,8 @@ if !exists('g:ibus#engine')
   echo 'ibus engine'
   echo 'turn on ibus, press enter to execute above command'
 else
-  if stridx(g:ibus#engine, ':') != -1
-    let engine_config = split(g:ibus#layout, ':')
-    let g:ibus#engine_config = {'type': engine_config[0], 'id': engine_config[1]}
+  if g:ibus#engine ==# 'xkb:us::eng'
+    let g:ibus#engine_config = {'type': 'xkb', 'id': 'us'}
   else
     let g:ibus#engine_config = {'type': 'ibus', 'id': g:ibus#engine}
   endif
